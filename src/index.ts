@@ -5,7 +5,7 @@ import { markdown, playwrightTest } from './report.js'
 import { startDashboard } from './server.js'
 import type { Dashboard } from './server.js'
 
-export const name = 'dsh-repro'
+export const name = 'dsh-frontend-replay'
 export const inject = ['tools'] as const
 export { Engine, startDashboard }
 export type { EngineOptions }
@@ -47,13 +47,13 @@ export function createTools(engine: Engine, open: () => Promise<Dashboard>): Too
       schema: { type: 'object', additionalProperties: true },
       render: (_args, value) => {
         const json = JSON.stringify(value, null, 2)
-        return [{ type: 'text', text: json.length > 24000 ? `${json.slice(0, 24000)}\n[Display clipped. Open the Repro workbench for complete evidence.]` : json }]
+        return [{ type: 'text', text: json.length > 24000 ? `${json.slice(0, 24000)}\n[Display clipped. Open the Frontend Replay workbench for complete evidence.]` : json }]
       },
     },
     execute: async (args, exec) => { exec.signal.throwIfAborted(); return await execute(record(args), exec.signal) },
   })
   return [
-    tool('open', 'Open the local Repro workbench. Return its URL to the user for manual recording, editing acceptance conditions, and comparing before/after evidence.', {}, [], async () => ({ url: (await open()).url })),
+    tool('open', 'Open the local Frontend Replay workbench. Return its URL to the user for manual recording, editing acceptance conditions, and comparing before/after evidence.', {}, [], async () => ({ url: (await open()).url })),
     tool('list', 'List recorded frontend bug cases and their acceptance conditions.', {}, [], async () => ({ cases: await engine.store.cases(), ...engine.status() })),
     tool('create', 'Create a frontend reproduction case with structured actions and explicit acceptance assertions. With no assertions, runs are UNVERIFIED, never passed. Use wait steps before asynchronous transitions. Password values must use ${ENV:VARIABLE_NAME} and secret:true.', caseProperties, ['title', 'url'], async args => ({ case: await engine.create(args) })),
     tool('update', 'Update a reproduction case. Preserve step and assertion ids when editing. Runs keep immutable snapshots; changing the case does not rewrite earlier evidence.', { case_id: text, ...caseProperties }, ['case_id'], async args => {
@@ -76,7 +76,7 @@ export function createTools(engine: Engine, open: () => Promise<Dashboard>): Too
     tool('export', 'Export a saved case as portable JSON or a standalone Playwright test. The Playwright test needs @playwright/test in the receiving project; no assertions means the generated test is skipped.', { case_id: text, format: { type: 'string', enum: ['json', 'playwright'] } }, ['case_id', 'format'], async args => {
       const item = await engine.store.case(id(args))
       if (args.format !== 'json' && args.format !== 'playwright') throw new InputError('format must be json or playwright')
-      return { filename: args.format === 'json' ? 'repro.case.json' : 'repro.spec.ts', content: args.format === 'json' ? JSON.stringify(item, null, 2) : playwrightTest(item) }
+      return { filename: args.format === 'json' ? 'frontend-replay.case.json' : 'frontend-replay.spec.ts', content: args.format === 'json' ? JSON.stringify(item, null, 2) : playwrightTest(item) }
     }),
   ]
 }
@@ -99,5 +99,5 @@ export async function apply(ctx: HarnessContext, config: EngineOptions & { port?
     if (dashboard) await (await dashboard).close()
   })
   for (const definition of createTools(engine, open)) ctx.tools.register(definition)
-  ctx.logger?.info('Repro ready. Ask the agent to call repro_open to open the workbench.')
+  ctx.logger?.info('Frontend Replay ready. Ask the agent to call repro_open to open the workbench.')
 }

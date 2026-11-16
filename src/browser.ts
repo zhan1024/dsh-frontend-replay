@@ -8,7 +8,7 @@ export async function launch(options: BrowserOptions, headless = options.headles
   try {
     return await chromium.launch({ headless, ...(options.executablePath ? { executablePath: options.executablePath } : {}) })
   } catch (error) {
-    if (String(error).includes("Executable doesn't exist")) throw new InputError('Chromium is not installed. Run: npx dsh-repro install-browser')
+    if (String(error).includes("Executable doesn't exist")) throw new InputError('Chromium is not installed. Run: npx dsh-frontend-replay install-browser')
     throw error
   }
 }

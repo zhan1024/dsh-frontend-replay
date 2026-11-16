@@ -15,7 +15,7 @@ async function main(): Promise<void> {
     return
   }
   if (args.includes('--help') || args.includes('-h')) {
-    console.log('Usage: dsh-repro [--port 4317] [--data-dir .dsh-repro] [--headless] [--open]\n       dsh-repro install-browser [--with-deps]')
+    console.log('Usage: dsh-frontend-replay [--port 4317] [--data-dir .dsh-repro] [--headless] [--open]\n       dsh-frontend-replay install-browser [--with-deps]')
     return
   }
   const options: { dataDir?: string; headless?: boolean; executablePath?: string } = {}
@@ -31,12 +31,12 @@ async function main(): Promise<void> {
       if (arg === '--port') { port = Number(value); if (!Number.isInteger(port) || port < 0 || port > 65535) throw new Error('port must be 0–65535') }
       else if (arg === '--data-dir') options.dataDir = value
       else options.executablePath = value
-    } else throw new Error(`Unknown option: ${arg}. Run dsh-repro --help`)
+    } else throw new Error(`Unknown option: ${arg}. Run dsh-frontend-replay --help`)
   }
   const engine = new Engine(options)
   await engine.init()
   const dashboard = await startDashboard(engine, port)
-  console.log(`\n  REPRO / Frontend evidence workbench\n\n  ${dashboard.url}\n\n  Data: ${engine.store.root}\n  Press Ctrl+C to stop.\n`)
+  console.log(`\n  FRONTEND REPLAY / Frontend evidence workbench\n\n  ${dashboard.url}\n\n  Data: ${engine.store.root}\n  Press Ctrl+C to stop.\n`)
   if (open) {
     const command = process.platform === 'darwin' ? 'open' : process.platform === 'win32' ? 'explorer.exe' : 'xdg-open'
     const child = spawn(command, [dashboard.url], { stdio: 'ignore' })
@@ -51,4 +51,4 @@ async function main(): Promise<void> {
   }
   process.once('SIGINT', close); process.once('SIGTERM', close)
 }
-main().catch(error => { console.error(`[dsh-repro] ${String(error)}`); process.exitCode = 1 })
+main().catch(error => { console.error(`[dsh-frontend-replay] ${String(error)}`); process.exitCode = 1 })

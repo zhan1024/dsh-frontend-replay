@@ -1,14 +1,24 @@
-# Repro · 前端故障复现与验收助手
+# 前端验修台 · Frontend Replay
 
 **留下复现步骤和证据，用同样的条件验收修复。**
 
-[English](./README.md) · [npm](https://www.npmjs.com/package/dsh-repro) · [源码](https://github.com/zhan1024/dsh-repro) · [版本与安装包](https://github.com/zhan1024/dsh-repro/releases)
+[English](./README.md) · [npm](https://www.npmjs.com/package/dsh-frontend-replay) · [源码](https://github.com/zhan1024/dsh-frontend-replay) · [版本与安装包](https://github.com/zhan1024/dsh-frontend-replay/releases)
 
-Repro 是 DeepSeek Harness（DSH）插件，同时提供独立的本地工作台。它把浏览器操作保存为可重放的步骤，采集控制台、页面异常、网络请求和截图，并在修改应用后重新执行验收条件。
+**前端验修台**（Frontend Replay，`dsh-frontend-replay`）是 DeepSeek Harness（DSH）插件，同时提供独立的本地工作台。它把浏览器操作保存为可重放的步骤，采集控制台、页面异常、网络请求和截图，并在修改应用后重新执行验收条件。
 
 只有步骤执行成功且所有验收条件通过，才显示“通过”。只完成录制或没有验收条件，均显示“尚未验证”。每次运行保存当时的用例快照；修改步骤和条件会显示对比提示，历史证据不会被覆盖。
 
-![Repro workbench: a failed baseline and a passing verification](./docs/workbench.jpg)
+![Frontend Replay workbench: a failed baseline and a passing verification](./docs/workbench.jpg)
+
+## 从旧版 Repro 迁移
+
+插件由 `dsh-repro` 更名为 `dsh-frontend-replay`，新版为 **0.2.0**。市场搜索 **dsh-frontend-replay** 或 **前端验修台**。如已安装旧版，先移除旧插件，再按下面的命令安装新版，避免重复注册同名 Agent 工具：
+
+```sh
+dsh plugin --profile web remove dsh-repro
+```
+
+新版继续使用 `.dsh-repro/`、`DSH_REPRO_DIR`、`DSH_REPRO_HEADLESS`、`repro_*` 工具和原有用例格式，直接读取原来的用例与证据。旧 CLI 名 `dsh-repro` 作为兼容别名保留；历史 v0.1.0 安装包仍可下载。
 
 ## 安装与启动
 
@@ -18,30 +28,30 @@ Repro 是 DeepSeek Harness（DSH）插件，同时提供独立的本地工作台
 
 ```sh
 # 从 npm 安装预构建插件
-dsh plugin --profile web add dsh-repro@0.1.0
+dsh plugin --profile web add dsh-frontend-replay@0.2.0
 
 # 安装配套 Chromium，仅需执行一次
-npm exec --yes --package=dsh-repro@0.1.0 -- dsh-repro install-browser
+npm exec --yes --package=dsh-frontend-replay@0.2.0 -- dsh-frontend-replay install-browser
 
 dsh web
 ```
 
 在 DSH 中输入：
 
-> 打开 Repro 工作台，我要录制一个前端故障并验收修复。
+> 打开前端验修台，我要录制一个前端故障并验收修复。
 
 Agent 会调用 `repro_open` 返回本机地址。打开包含 `#token` 片段的**完整地址**。
 
 也可以安装 GitHub Release 中完全相同的预构建包：
 
 ```sh
-dsh plugin --profile web add https://github.com/zhan1024/dsh-repro/releases/download/v0.1.0/dsh-repro-0.1.0.tgz
+dsh plugin --profile web add https://github.com/zhan1024/dsh-frontend-replay/releases/download/v0.2.0/dsh-frontend-replay-0.2.0.tgz
 ```
 
 也可以独立使用，无需模型 API Key：
 
 ```sh
-npm exec --yes --package=dsh-repro@0.1.0 -- dsh-repro --open
+npm exec --yes --package=dsh-frontend-replay@0.2.0 -- dsh-frontend-replay --open
 ```
 
 ## 完整使用流程
@@ -63,7 +73,7 @@ npm exec --yes --package=dsh-repro@0.1.0 -- dsh-repro --open
 - 录制支持顶层页面的点击、输入、选择、勾选、Enter、导航与刷新。iframe、文件上传、拖拽、canvas、富文本、多窗口和多选下拉需要手动适配。延迟跳转和自动导航后，请检查录制步骤，按需补充打开页面、刷新或等待。
 - 每次运行使用独立上下文，不自动保存登录态，也不重置目标应用的后端数据。登录可作为录制步骤的一部分。
 - 断言最多等待 `timeoutMs`；先等待 350 ms，再执行 DOM/请求断言，最后检查异常。更晚发生的应用变化需要增加明确的等待步骤。
-- 源码位置来自浏览器堆栈等证据，是排查候选，不能直接视为已确认的根因。Repro 不自动修改应用，DSH Agent 可用其常规代码工具继续修复。
+- 源码位置来自浏览器堆栈等证据，是排查候选，不能直接视为已确认的根因。Frontend Replay 不自动修改应用，DSH Agent 可用其常规代码工具继续修复。
 
 ## DSH 工具
 
@@ -79,7 +89,7 @@ npm exec --yes --package=dsh-repro@0.1.0 -- dsh-repro --open
 
 可以直接对 Agent 说：
 
-> 为 http://localhost:5173/settings 创建 Repro 用例：在 `[data-testid="name"]` 输入“示例项目”，点击 `[data-testid="save"]`，等待 `#status` 包含“保存成功”，然后刷新。验收 `#persisted-name` 包含“示例项目”，且没有未捕获页面异常。先运行复现基线，等代码修复后用同样用例验收。
+> 为 http://localhost:5173/settings 创建前端验修台用例：在 `[data-testid="name"]` 输入“示例项目”，点击 `[data-testid="save"]`，等待 `#status` 包含“保存成功”，然后刷新。验收 `#persisted-name` 包含“示例项目”，且没有未捕获页面异常。先运行复现基线，等代码修复后用同样用例验收。
 
 ## 配置与本地数据
 
@@ -93,7 +103,7 @@ dsh web
 Profile 配置示例：
 
 ```yaml
-- id: dsh-repro
+- id: dsh-frontend-replay
   config:
     dataDir: /你的项目路径/.dsh-repro
     headless: false

@@ -1,25 +1,11 @@
-# Repro v0.1.0 · Published package verification
+# Frontend Replay 0.2.0 · Published package verification
 
-Verified on 2026-11-16.
+The plugin is renamed from Repro (`dsh-repro`) to **Frontend Replay · 前端验修台** (`dsh-frontend-replay`). Verified locally on 2026-11-16.
 
-- Release source commit: `5838f961b523fa180add449257091f6d949fe606`.
-- GitHub release: https://github.com/zhan1024/dsh-repro/releases/tag/v0.1.0
-- npm: https://www.npmjs.com/package/dsh-repro/v/0.1.0 — public and downloadable after registry processing.
-- Ubuntu / Node.js 24 CI: https://github.com/zhan1024/dsh-repro/actions/runs/43801175202 — success.
-- Local verification: strict TypeScript check, 6 unit/API tests, 7 real Chromium tests, and the DSH agent integration passed.
-- Downloaded the GitHub release tarball and SHA256SUMS anonymously over HTTPS; hashes match.
-- Downloaded `dsh-repro@0.1.0` anonymously from the npm registry. Its SHA-256 matches the GitHub release package, and its SHA-512 matches the registry's published integrity value.
-- SHA-256: `fb587af402198702e37f0d932e54823202c391d0546dc4019ee071f9f06bf294`.
-- Installed both the public GitHub release URL and the exact npm version into separate fresh DSH profiles. In each run, all 9 Repro tools were offered to the deterministic model, which completed `repro_create → repro_run → repro_report` with a passing real Chromium result.
-- Executed the CLI from the GitHub release URL with `npm exec`.
-- Executed `npm exec --yes --package=dsh-repro@0.1.0 -- dsh-repro --help` from an independent directory with a new npm cache; it exited successfully.
+- Strict TypeScript checks passed.
+- Six unit/API tests and seven real Chromium tests passed, including English/Chinese branding, a failed baseline, a passing verification, reports and 390 px layout.
+- The newly packed `dsh-frontend-replay` bundle installed into a fresh DSH profile; all nine tools were registered, and create → real Chromium replay → report passed.
+- The GitHub repository was renamed in place to `zhan1024/dsh-frontend-replay`; its repository ID and creation time (`2026-11-16T03:54:47Z`) were retained.
+- Public npm/Release publication and fresh-profile installation checks are pending. This file will be updated with the actual downloaded artifact hashes and results after publishing.
 
-The npm integration can be repeated from the source repository:
-
-```sh
-DSH_BIN=/path/to/dsh REPRO_PLUGIN_SPEC=dsh-repro@0.1.0 npm run test:dsh
-```
-
-The browser demo establishes a failed baseline and a passing verification using unchanged steps and assertions. The generated Playwright test was also executed independently and observed both outcomes.
-
-The DSH integration uses a deterministic local model endpoint; it verifies tool integration, not LLM decision quality. See the README for recording scope and data handling.
+Historical v0.1.0 artifacts and evidence remain in [PUBLISHED-VERIFICATION-0.1.0.md](./PUBLISHED-VERIFICATION-0.1.0.md). They do not establish that 0.2.0 has passed public download verification.

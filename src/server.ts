@@ -44,7 +44,7 @@ export async function startDashboard(engine: Engine, port = 0): Promise<Dashboar
         if (actual.length !== expected.length || !timingSafeEqual(actual, expected)) return send(response, 401, { error: 'Open the complete workbench URL, including its #token fragment' })
         const parts = path.split('/').filter(Boolean)
         const id = parts[2]
-        if (path === '/api/bootstrap' && method === 'GET') return send(response, 200, { cases: await engine.store.cases(), ...engine.status(), demoFixed, version: '0.1.0' })
+        if (path === '/api/bootstrap' && method === 'GET') return send(response, 200, { cases: await engine.store.cases(), ...engine.status(), demoFixed, version: '0.2.0' })
         if (path === '/api/cases' && method === 'POST') return send(response, 201, await engine.create(await body(request)))
         if (parts[1] === 'cases' && id) {
           if (parts.length === 3 && method === 'GET') return send(response, 200, { case: await engine.store.case(id), runs: await engine.store.runs(id) })
@@ -89,13 +89,13 @@ export async function startDashboard(engine: Engine, port = 0): Promise<Dashboar
             description: 'Reproduce a settings form that reports success but loses its data on refresh. Run a baseline, apply the demo fix, then verify the same case.',
             steps: [
               { action: 'navigate', url: `${origin}/demo` },
-              { action: 'fill', selector: '[data-testid="workspace-name"]', value: 'Repro workspace' },
+              { action: 'fill', selector: '[data-testid="workspace-name"]', value: 'Frontend Replay workspace' },
               { action: 'click', selector: '[data-testid="save"]' },
               { action: 'wait', selector: '#status', value: 'Saved.' },
               { action: 'click', selector: '#refresh' },
             ],
             assertions: [
-              { type: 'text', selector: '#persisted', expected: 'Repro workspace' },
+              { type: 'text', selector: '#persisted', expected: 'Frontend Replay workspace' },
               { type: 'visible', selector: '#settings' },
               { type: 'no_page_errors' },
             ],
@@ -134,7 +134,7 @@ export async function startDashboard(engine: Engine, port = 0): Promise<Dashboar
       const value = error as { status?: number; code?: string; message?: string }
       const status = value.status ?? (value.code === 'ENOENT' ? 404 : 500)
       if (!response.headersSent) send(response, status, { error: status === 500 ? 'Operation failed; inspect the local terminal for details' : value.message ?? 'Request failed' })
-      if (status === 500) console.error('[dsh-repro]', error)
+      if (status === 500) console.error('[dsh-frontend-replay]', error)
     })
   })
   await new Promise<void>((resolve, reject) => { server.once('error', reject); server.listen(port, '127.0.0.1', resolve) })

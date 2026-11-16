@@ -1,4 +1,4 @@
-name: Verify Repro
+name: Verify Frontend Replay
 on:
   push:
   pull_request:

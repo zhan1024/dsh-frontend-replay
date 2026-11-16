@@ -81,7 +81,7 @@ try{
     {id:'session-telemetry-otel',disabled:true},
   ]
   await writeFile(join(home,'profiles','headless','cordis.patch.yml'),JSON.stringify(patch,null,2))
-  const dump=await command(dsh,['headless','--dump-config'],{env});assert.equal(dump.code,0,dump.stderr);assert.match(dump.stdout,/name: ['"]?dsh-repro/)
+  const dump=await command(dsh,['headless','--dump-config'],{env});assert.equal(dump.code,0,dump.stderr);assert.match(dump.stdout,/name: ['"]?dsh-frontend-replay/)
   const run=await command(dsh,['headless','Create a frontend case, replay it, inspect the report, then state its result.'],{env})
   log(`$ dsh headless <task>\n${run.stdout}\n${run.stderr}`)
   assert.equal(run.code,0,'harness exits successfully')

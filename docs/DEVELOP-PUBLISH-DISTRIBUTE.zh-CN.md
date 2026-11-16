@@ -1,85 +1,62 @@
-# Repro 核心开发、发布、市场投稿与下载安装手册
+# 前端验修台 · Frontend Replay：开发、发布、市场收录与安装
 
-记录日期：2026 年 11 月 16 日。版本：`dsh-repro@0.1.0`。
+包名：`dsh-frontend-replay`。本轮版本：`0.2.0`。
 
-本手册记录已经执行的工作，以及之后发布新版本可以复用的步骤。市场状态是本次核验的快照，实际进度以对应 PR、Issue 和公开目录为准。
+本次由 Repro / `dsh-repro` 更名，目的是让名称直接表达前端故障录制、回放和修复验收的用途。历史发布不覆盖、不删除；[0.1.0 操作记录](./DEVELOP-PUBLISH-DISTRIBUTE-0.1.0.zh-CN.md)和[历史校验记录](./PUBLISHED-VERIFICATION-0.1.0.md)保持独立。
 
-## 1. 本次交付和渠道状态
+## 1. 本轮分发状态
 
-Repro 的完整功能链路是：创建故障用例 → 录制或编写步骤 → 设置验收条件 → 保存修复前基线 → 修改应用 → 用相同条件重放 → 比较证据 → 导出报告或测试。
-
-| 渠道 | 本次实际状态 | 入口或凭证 |
+| 渠道 | 实际状态 | 入口 |
 | --- | --- | --- |
-| npm | `dsh-repro@0.1.0` 已公开，匿名下载和实际安装通过 | [npm 包](https://www.npmjs.com/package/dsh-repro) |
-| GitHub | 源码、v0.1.0 Release、预构建安装包、校验和与示例报告已公开 | [仓库](https://github.com/zhan1024/dsh-repro) · [Release](https://github.com/zhan1024/dsh-repro/releases/tag/v0.1.0) |
-| DeepseekPlugin | 已自动发布，详情页显示 README 和正确安装命令；另用不带登录信息的 HTTP 请求确认服务端存在此条目 | [公开详情](https://deepseekplugin.org/en/plugins/submitted?slug=zhan1024-2f-dsh-2d-repro) |
-| DSHMarket / awesome-dsh-plugin | 已提交收录 PR，等待年龄门槛、CI 与维护者审核；尚未认定市场上线 | [PR #15772](https://github.com/awesome-dsh-plugin/awesome-dsh-plugin/pull/15772) · [DSHMarket](https://dshmarket.com/zh/) |
-| dshplugin.io | 已按站点的 Submit plugin 入口提交 GitHub Issue，等待维护者处理 | [投稿 #50](https://github.com/tjsdyy/dshplugin/issues/50) · [目录](https://dshplugin.io/) |
+| npm | 0.2.0 更名包待发布和匿名下载复验 | https://www.npmjs.com/package/dsh-frontend-replay |
+| GitHub | 仓库已更名并保留原创建时间；0.2.0 标签和 Release 待发布 | https://github.com/zhan1024/dsh-frontend-replay |
+| DSHMarket / awesome-dsh-plugin | 继续更新原 PR #15772，待审核与索引 | https://github.com/awesome-dsh-plugin/awesome-dsh-plugin/pull/15772 |
+| DeepseekPlugin | 旧名条目已上线，新名待提交和核验 | https://deepseekplugin.org/en/submit |
+| dshplugin.io | 更新原投稿 #50，待维护者处理 | https://github.com/tjsdyy/dshplugin/issues/50 |
 
-DSHMarket 的收录源要求仓库创建满 1 天。本仓库创建于 `2026-11-16T03:54:47Z`，于 **2026 年 11 月 17 日 11:54:47（北京时间，UTC+8）**满 24 小时。PR 中如实保留了未勾选的年龄检查项。上游脚本按当前时间计算年龄，并会定期重跑因年龄失败的 gate；到时无需空提交或重开 PR。满 24 小时只解决这一项，最终上线仍取决于人工审核、合并和索引更新。
+公开发布的实际证据记录在 [PUBLISHED-VERIFICATION.md](./PUBLISHED-VERIFICATION.md)。提交申请不等于市场已收录。
 
-另检查了 dsh.directory 和 dshx.cn：本次环境分别遇到连接关闭和证书域名错误，未能提交。以上渠道均按实际适配 DSH 的能力选择，没有可核实的流量排名或下载量保证。DSH bundle 需要平台适配才能作为 VS Code、Claude 或其他宿主的原生插件发布。
+GitHub 原仓库创建于 `2026-11-16T03:54:47Z`。本轮使用原仓库更名，保留仓库历史和创建时间，预计于 **2026 年 11 月 17 日 11:54:47（北京时间）**达到上游要求的 24 小时门槛。年龄检查可以自动刷新，无需空提交、重开 PR 或重复投稿。
 
-![DeepseekPlugin 上线详情与安装命令](./deepseekplugin-published.jpg)
+## 2. 核心开发
 
-## 2. 核心开发：让功能与宿主加载分别成立
-
-Harness 负责模型、Agent 循环、工具注册、会话、配置和生命周期。Repro 是被 Harness 加载的扩展：模型调用 Repro 工具，工具执行真实浏览器操作，再把结构化结果送回 Agent。独立工作台和 DSH 工具共用同一个引擎，避免两套执行逻辑产生不同结果。
+Harness 提供 Agent 循环、工具注册和生命周期。插件通过 `inject = ['tools']` 获取工具服务，在 `apply()` 注册工具，并通过 `ctx.effect()` 清理浏览器和本地工作台。
 
 | 文件 | 作用 |
 | --- | --- |
-| `src/model.ts` | 用例、步骤、验收条件、运行结果的类型与输入校验、凭据脱敏 |
-| `src/browser.ts` | Playwright Chromium 启动、录制、选择器和浏览器证据采集 |
-| `src/engine.ts` | 录制/重放互斥、基线、验收、运行快照、取消与资源回收 |
-| `src/store.ts` | 本地用例、运行 JSON、截图目录的持久化 |
-| `src/report.ts` | Markdown、HTML 报告以及可独立运行的 Playwright 测试导出 |
-| `src/server.ts` | 本机工作台 HTTP/API、鉴权、Host/Origin 检查 |
-| `src/index.ts` | DSH 插件入口、工具 JSON Schema、注册和卸载清理 |
-| `src/cli.ts` | 独立启动、打开工作台和安装配套 Chromium |
-| `ui/` | 中英文工作台、录制/验收状态、证据与前后对比 |
+| `src/model.ts` | 用例、步骤、验收条件、输入校验和脱敏 |
+| `src/browser.ts` | Chromium 录制、回放及浏览器证据 |
+| `src/engine.ts` | 执行互斥、基线和验收、不可变运行快照 |
+| `src/store.ts` | 本地用例、运行与截图持久化 |
+| `src/report.ts` | HTML、Markdown、JSON 和 Playwright 导出 |
+| `src/server.ts` | 回环 HTTP/API、启动令牌、Host/Origin 校验 |
+| `src/index.ts` | DSH 插件入口和九个 `repro_*` 工具 |
+| `src/cli.ts`、`ui/` | 独立 CLI 和中英文工作台 |
 
-核心判定必须先确定：步骤失败则运行失败；所有步骤和所有验收条件成功才通过；没有验收条件仍为 `unverified`。每次运行保存当时的用例快照；改变步骤或断言后，不能用旧基线直接证明同一问题已经修复。测试浏览器每次创建独立上下文。
+只有所有步骤和验收条件都通过才能显示通过；没有验收条件显示尚未验证。每次运行使用独立浏览器上下文，保存当时的用例快照。修复真实应用由开发者或 Agent 完成，插件负责证据与验收。
 
-当前注册九个工具：`repro_open`、`repro_list`、`repro_create`、`repro_update`、`repro_record`、`repro_stop_recording`、`repro_run`、`repro_report`、`repro_export`。工具包含参数 schema、输出 schema/文本呈现和可取消的执行函数。插件通过 `inject = ['tools']` 获取工具服务，在 `apply()` 中注册，通过 `ctx.effect()` 清理引擎和工作台。
-
-### DSH 能安装的关键声明
-
-`package.json` 的相关片段：
+安装入口必须同时配置：
 
 ```json
 {
-  "name": "dsh-repro",
-  "type": "module",
+  "name": "dsh-frontend-replay",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
-  "bin": { "dsh-repro": "./dist/cli.js" },
+  "bin": { "dsh-frontend-replay": "./dist/cli.js", "dsh-repro": "./dist/cli.js" },
   "dsh": { "bundle": { "patch": "./cordis.patch.yml" } },
   "scripts": { "prepack": "npm run build" }
 }
 ```
 
-根目录 `cordis.patch.yml`：
+`cordis.patch.yml` 使用 `id: dsh-frontend-replay` 和 `name: dsh-frontend-replay`。为兼容旧用例，数据目录仍默认 `.dsh-repro`，环境变量仍为 `DSH_REPRO_DIR`、`DSH_REPRO_HEADLESS`；工具仍为 `repro_open` 等九个原有名称。
 
-```yaml
-- insert:
-    - id: dsh-repro
-      name: dsh-repro
-      config:
-        dataDir: !!js process.env.DSH_REPRO_DIR || '.dsh-repro'
-        headless: !!js process.env.DSH_REPRO_HEADLESS === '1'
-```
+## 3. 本地开发与验证
 
-`dsh.bundle` 把包接入 profile，`cordis.patch.yml` 说明加载哪个插件和配置。只写 `dsh.client` 不能替代 bundle。Repro 的工作台是独立的本机页面，通过 `repro_open` 返回地址，因此本包不需要声明嵌入 DSH 前端的 client 入口。
-
-`files` 白名单应包含 `dist/`、`ui/`、文档、patch、README 和许可证；构建结果需在包中真实存在。官方宿主包如需依赖，应按其扩展契约使用 peerDependencies，避免打包第二份宿主运行时。本插件运行时直接依赖固定版本的 Playwright。
-
-## 3. 本地开发与验收
-
-独立模式要求 Node.js 22.15+。本次集成测试所用 DSH 0.2.2-rc.1 自身要求 **Node.js 24.9+**；profile 安装还需要 pnpm 10+。建议整个开发环境采用受支持的 Node 24 LTS 版本。
+独立模式要求 Node.js 22.15+；已验证的 DSH 0.2.2-rc.1 要求 Node.js 24.9+，profile 安装需 pnpm 10+。建议开发环境使用 Node 24 LTS。
 
 ```sh
-git clone https://github.com/zhan1024/dsh-repro.git
-cd dsh-repro
+git clone https://github.com/zhan1024/dsh-frontend-replay.git
+cd dsh-frontend-replay
 npm ci
 npm run browsers
 npm run typecheck
@@ -90,186 +67,72 @@ npm pack --dry-run --json
 git diff --check
 ```
 
-本次已完成：严格 TypeScript 检查、6 项单元/API 测试、7 项真实 Chromium 测试，以及真实 DSH Agent 循环测试。CI 使用 Ubuntu 和 Node 24。详细证据见 [VERIFICATION.md](./VERIFICATION.md) 和 [PUBLISHED-VERIFICATION.md](./PUBLISHED-VERIFICATION.md)。
+测试验证真实 Chromium 录制、修复前失败/修复后通过、无断言和执行失败状态、异常与网络证据、UI、中英文名称、窄屏与报告导出。DSH 测试从打包产物装入独立 profile，通过确定性的本地模型服务调用创建、回放和报告工具；这不代表模型推理质量测评。
 
-`test:dsh` 把打包产物装进临时 profile，再通过本地确定性模型服务驱动 `repro_create → repro_run → repro_report`；它验证真实工具协议、包加载、浏览器和结果回传，不评估大模型自主推理质量。可设置 `DSH_BIN=/path/to/dsh` 复用 DSH。
+可用 `DSH_BIN=/path/to/dsh` 复用宿主。若 npm 全局启用了 `legacy-peer-deps=true`，安装测试宿主时局部传入 `--legacy-peer-deps=false`。本地启动：`npm start -- --open`，依次体验示例、基线、示例修复、验收和导出。
 
-如果机器的 npm 全局配置为 `legacy-peer-deps=true`，安装测试用 DSH 时应局部指定 `--legacy-peer-deps=false`，以安装其 Cordis peer 依赖；无需修改用户全局配置。
+## 4. npm 和 GitHub 发布
 
-开发时打开工作台：
-
-```sh
-npm run build
-npm start -- --open
-```
-
-手动验证：点击“体验示例故障”→ 保存基线并观察失败 → 点击“应用示例修复”→ 用相同用例验收通过 → 下载 HTML 和 Playwright 测试。这个开关只改变内置示例，真实项目需由开发者或 Agent 修改代码。
-
-## 4. 打包和 npm 发布
-
-先确认 `repository.url` 指向自己的公开仓库、版本号正确、MIT 许可证和双语说明齐全。在 GitHub 添加 `dsh-plugin` topic。`npm pack --dry-run --json` 用于审查包清单，确认存在预构建 JS、类型、工作台资源和 patch，且不包含环境文件、凭据、node_modules 或 `.dsh-repro/` 运行数据。
-
-以下是**下一次版本发布的示例**，并非要求重新发布已存在的 0.1.0；`0.1.1` 只是示例版本，实际应按改动选择尚未占用的版本。先完成代码和文档，再执行：
+先完成代码、README、版本号和 `repository` 元数据，再运行上面的验证。将代码提交后固定标签，不移动已有标签。`0.2.0` 仅用于本轮更名，后续请选择未被占用的新版本。
 
 ```sh
-REPRO_VERSION=0.1.1
-npm version "$REPRO_VERSION" --no-git-tag-version
-npm run typecheck
-npm test
-npm run test:e2e
-npm run test:dsh
-npm pack --dry-run --json
-git diff --check
-```
-
-把该版本的代码、package.json、lockfile 和说明提交到 Git。发布标签应固定到这个经过验证的提交，不要移动旧标签。
-
-```sh
-git add package.json package-lock.json src ui test docs README.md README.zh-CN.md cordis.patch.yml
-git commit -m "release: v$REPRO_VERSION"
-git tag "v$REPRO_VERSION"
+FP_VERSION=0.2.0
+git add package.json package-lock.json src ui test docs README.md README.zh-CN.md cordis.patch.yml CHANGELOG.md .github
+git commit -m "feat: rename plugin to Frontend Replay"
+git tag "v$FP_VERSION"
 git push origin main
-git push origin "v$REPRO_VERSION"
-
-REPRO_ASSETS=$(mktemp -d)
-npm pack --pack-destination "$REPRO_ASSETS"
-(cd "$REPRO_ASSETS" && shasum -a 256 "dsh-repro-$REPRO_VERSION.tgz" > SHA256SUMS)
+git push origin "v$FP_VERSION"
+FP_ASSETS=$(mktemp -d)
+npm pack --pack-destination "$FP_ASSETS"
+(cd "$FP_ASSETS" && shasum -a 256 "dsh-frontend-replay-$FP_VERSION.tgz" > SHA256SUMS)
 ```
 
-首次或登录失效时运行 `npm login --auth-type=web --registry=https://registry.npmjs.org/`。用户在 npm 官方页面完成登录、CLI 授权及要求的二次验证；网站已登录与终端获得授权是不同状态。不要把密码、Token 或验证码写进代码、文档或聊天。
+首次或授权失效时：`npm login --auth-type=web --registry=https://registry.npmjs.org/`。账号登录、CLI 授权和发布二次验证都在 npm 官方页面完成，不在文档、代码或聊天中保存密码、Token 或验证码。
 
 ```sh
 npm whoami --registry=https://registry.npmjs.org/
-npm publish "$REPRO_ASSETS/dsh-repro-$REPRO_VERSION.tgz" --access public --registry=https://registry.npmjs.org/
-npm view "dsh-repro@$REPRO_VERSION" version dist.tarball dist.integrity --json --registry=https://registry.npmjs.org/
+npm publish "$FP_ASSETS/dsh-frontend-replay-$FP_VERSION.tgz" --access public --registry=https://registry.npmjs.org/
+npm view "dsh-frontend-replay@$FP_VERSION" version dist.tarball dist.integrity --json --registry=https://registry.npmjs.org/
+gh release create "v$FP_VERSION" "$FP_ASSETS/dsh-frontend-replay-$FP_VERSION.tgz" "$FP_ASSETS/SHA256SUMS" --repo zhan1024/dsh-frontend-replay --verify-tag --title "Frontend Replay · 前端验修台 v$FP_VERSION" --notes-file release-notes.md
 ```
 
-本次首次发布后，npm 约经过 6 分钟的处理才可公开获取。这是本次观察，不是固定等待时间。发布后必须确认 registry 元数据与 tarball 可匿名访问，再做安装测试；终端显示上传成功不等于已经可下载。
+`release-notes.md` 应在发布前写好实际改动、迁移方法和验证结果。npm 和 GitHub 上传同一份 `.tgz`。之后分别匿名下载，核对 SHA-256 与 npm integrity，在新 profile 安装并跑 DSH 测试。可用 `REPRO_PLUGIN_SPEC=dsh-frontend-replay@0.2.0 npm run test:dsh` 指定公开包；也可填 GitHub Release tarball URL。
 
-## 5. GitHub Release 与发布包复验
+在独立空目录执行 `npm exec --yes --package=dsh-frontend-replay@0.2.0 -- dsh-frontend-replay --help`，验证真实下载及新命令。包名更换需发布一个新 npm 包；旧包和旧版本不会自动改名或迁移统计。仅当新包确认可下载后，才在旧包添加迁移提示。
 
-GitHub Release 上传与 npm **同一份** `.tgz`，附 SHA256SUMS、版本说明、验证记录和示例报告。先准备好 `release-notes.md` 的实际内容，再创建 Release：
+## 5. 市场上传与审核
+
+DSHMarket 的收录源是 `awesome-dsh-plugin/awesome-dsh-plugin`。更新现有 PR，只保留一个当前名称的 `data/plugins/zhan1024__dsh-frontend-replay.yml`，按上游 schema 设置仓库 URL、名称、`browser` 分类、中英文描述、固定版本 tarball 和图标。不要修改自动生成的 README，也不要添加 `npm:` 字段；npm 包通过 `repository` 自动关联。用上游 `readEntries()` / `validateEntries()` 校验。
+
+插件自己的 `screenshots.json` 声明 `docs/workbench.jpg`。图标用 `docs/icon.png`；截图与图标随源码公开。合并后还要在 DSHMarket 搜索 `dsh-frontend-replay`，核对作者、版本、安装命令及实际下载，才能确认收录完成。
+
+DeepseekPlugin 在提交页填新仓库 URL 并执行其发布操作；核验公开详情及匿名查询结果。dshplugin.io 通过原 Issue #50 更新名称、仓库、包版本、双语说明、截图及安装命令。人工审核状态如实保留，避免重复创建同一插件的投稿。
+
+## 6. 用户下载安装与升级
+
+旧版用户先执行 `dsh plugin --profile web remove dsh-repro`，然后安装新包：
 
 ```sh
-gh release create "v$REPRO_VERSION" \
-  "$REPRO_ASSETS/dsh-repro-$REPRO_VERSION.tgz" \
-  "$REPRO_ASSETS/SHA256SUMS" \
-  --repo zhan1024/dsh-repro \
-  --verify-tag \
-  --title "Repro v$REPRO_VERSION" \
-  --notes-file release-notes.md
-```
-
-本次 v0.1.0 的发布源码为 `5838f961b523fa180add449257091f6d949fe606`。npm 与 GitHub tarball 的 SHA-256 相同：
-
-```text
-fb587af402198702e37f0d932e54823202c391d0546dc4019ee071f9f06bf294
-```
-
-从公开地址再次安装，才能发现“源码能跑但发布包缺文件”的问题。本次两个来源均已装进不同的全新 DSH profile 并运行 Agent 验收。重跑当前已发布版本：
-
-```sh
-DSH_BIN=/path/to/dsh REPRO_PLUGIN_SPEC=dsh-repro@0.1.0 npm run test:dsh
-
-DSH_BIN=/path/to/dsh \
-  REPRO_PLUGIN_SPEC=https://github.com/zhan1024/dsh-repro/releases/download/v0.1.0/dsh-repro-0.1.0.tgz \
-  npm run test:dsh
-```
-
-CLI 下载验证应在独立空目录进行，例如 `mktemp -d` 后进入该目录，再执行 `npm exec --yes --package=dsh-repro@0.1.0 -- dsh-repro --help`。在插件自己的源码目录运行时，npm 可能优先识别当前同名项目，无法证明 registry 下载链路。
-
-## 6. 上传到市场：不同渠道分别提交
-
-### DSHMarket / awesome-dsh-plugin
-
-本次核对到 DSHMarket 从 awesome-dsh-plugin 目录构建索引。向该仓库提交一个条目文件，经 CI、人工审核、合并、索引刷新后，才形成市场入口。这里上传的是目录元数据，实际安装包仍来自 npm 或 GitHub Release。
-
-在插件自己的仓库根目录加入 `screenshots.json`：
-
-```json
-["docs/workbench.jpg"]
-```
-
-目录允许 1–8 张截图，优先使用仓库内相对路径；图标使用 GitHub 托管的 PNG/JPG/WebP。Repro 将现有 SVG 图标转为 PNG，并未新增设计或运行时代码。截图后续在自己的仓库更新即可。
-
-Fork `awesome-dsh-plugin/awesome-dsh-plugin`，新建分支，只添加 `data/plugins/zhan1024__dsh-repro.yml`：
-
-```yaml
-url: https://github.com/zhan1024/dsh-repro
-name: zhan1024/dsh-repro
-category: browser
-description:
-  en: Record and replay frontend bugs, compare baseline and verification evidence against explicit acceptance conditions, and export reports and Playwright tests.
-  zh: 录制与重放前端缺陷，按明确验收条件对比基线和验证证据，并导出报告与 Playwright 测试。
-tarball: https://github.com/zhan1024/dsh-repro/releases/download/v0.1.0/dsh-repro-0.1.0.tgz
-icon: https://raw.githubusercontent.com/zhan1024/dsh-repro/main/docs/icon.png
-```
-
-不要手工修改上游生成的 README，不要在 YAML 添加 `npm:` 字段；npm 包通过自身 `repository` 字段与目录关联。固定 Release tarball 可以为预构建安装提供明确的备用来源。
-
-本地在目录仓库安装依赖后，用其 `scripts/lib/entries.mjs` 的 `readEntries()` / `validateEntries()` 校验 schema、文件名与重复 URL，再运行 `git diff --check`。推送分支并创建 PR。本次只新增上述一个文件，PR 为 [#15772](https://github.com/awesome-dsh-plugin/awesome-dsh-plugin/pull/15772)。
-
-提交前需满足 bundle、真实代码、`dsh-plugin` topic、仓库年龄等规则。Repro 的年龄尚未达到，因此申请中准确注明达标时间，等待上游自动重新检查及维护者审核。其他 CI 失败应读取具体日志并修复，不能把所有红灯都归因于年龄。
-
-合并后，再在市场搜索 `dsh-repro`，确认作者、版本和安装命令，完成一次从市场入口到真实安装的验证。市场索引刷新有延迟，不能把 PR 已提交或合并直接写成全部市场已经可下载。规则来源：[贡献指南](https://github.com/awesome-dsh-plugin/awesome-dsh-plugin/blob/main/contributing.md)。
-
-### DeepseekPlugin
-
-进入 [提交页](https://deepseekplugin.org/en/submit)，填公开 GitHub 仓库地址，执行其自动发布操作。页面解析 repository、topic、bundle 和 README 后生成详情。
-
-本次页面返回发布成功，详情显示 `dsh plugin --profile web add dsh-repro@0.1.0`。随后通过匿名 GET `https://deepseekplugin.org/api/submissions/zhan1024-2f-dsh-2d-repro` 得到 `ok: true`、正确仓库 URL、`installable: true` 和同一安装命令，确认服务端条目存在。页面截图保存在本手册上方。
-
-### dshplugin.io
-
-站点的 Submit plugin 指向其 GitHub 仓库 Issue。提交仓库、版本、双语描述、分类、manifest、安装命令、Release、截图和验证记录。本次已建立 [Issue #50](https://github.com/tjsdyy/dshplugin/issues/50)。Issue 处于开放状态只代表投稿已送达；须等维护者处理并在目录实际检索到插件，才能报告上架。
-
-## 7. 别人如何下载、安装和使用
-
-已有 DSH 环境时直接执行：
-
-```sh
-dsh plugin --profile web add dsh-repro@0.1.0
-npm exec --yes --package=dsh-repro@0.1.0 -- dsh-repro install-browser
+dsh plugin --profile web add dsh-frontend-replay@0.2.0
+npm exec --yes --package=dsh-frontend-replay@0.2.0 -- dsh-frontend-replay install-browser
 dsh web
 ```
 
-在 DSH 中说：“打开 Repro 工作台，我要录制一个前端故障并验收修复。”Agent 调用 `repro_open`，打开它返回的完整本机地址。首次使用 DSH 本身还需按宿主引导配置模型；独立工作台无需模型账号。
+在 DSH 中输入：“打开前端验修台，我要录制一个前端故障并验收修复。”打开 `repro_open` 返回的完整地址（包含启动令牌）。旧用例继续从同一个 `.dsh-repro/` 读取，跨启动目录可设置绝对路径 `DSH_REPRO_DIR`。
 
-尚未安装宿主时，可在 Node 24.9+ 环境安装本次测试所用版本，已有环境则跳过：
-
-```sh
-npm install -g pnpm@10
-npm install -g --legacy-peer-deps=false @deepseek-ai/dsh@0.2.2-rc.1
-```
-
-上述命令固定在已测试版本，不代表它永远是最新 DSH。之后升级宿主或 Playwright 时，应重新跑集成测试。
-
-也可从 Release 安装：
+Release 安装：
 
 ```sh
-dsh plugin --profile web add https://github.com/zhan1024/dsh-repro/releases/download/v0.1.0/dsh-repro-0.1.0.tgz
+dsh plugin --profile web add https://github.com/zhan1024/dsh-frontend-replay/releases/download/v0.2.0/dsh-frontend-replay-0.2.0.tgz
 ```
 
-安装 Chromium 后独立使用：
+独立使用或只下载包：
 
 ```sh
-npm exec --yes --package=dsh-repro@0.1.0 -- dsh-repro --open
+npm exec --yes --package=dsh-frontend-replay@0.2.0 -- dsh-frontend-replay --open
+npm pack dsh-frontend-replay@0.2.0 --registry=https://registry.npmjs.org/
 ```
 
-只下载 npm 安装包、不安装到 DSH：在目标下载目录执行 `npm pack dsh-repro@0.1.0 --registry=https://registry.npmjs.org/`；也可在 GitHub Release 的 Assets 下载 `.tgz` 和 SHA256SUMS，运行 `shasum -a 256 -c SHA256SUMS` 核对。
+Release Assets 还提供 `.tgz` 和 `SHA256SUMS`。工作流：创建用例 → 录制 → 添加验收条件 → 基线 → 修复应用 → 用相同步骤验收 → 导出报告。卸载新版：`dsh plugin --profile web remove dsh-frontend-replay`；用例与证据仍保存在本地数据目录。
 
-工作台使用流程：新建用例 → 录制 → 设置可观察的验收条件 → 运行基线 → 修复真实应用 → 验收 → 导出报告。默认数据目录是启动目录下 `.dsh-repro/`；跨目录启动时用绝对路径 `DSH_REPRO_DIR` 指定数据位置。
-
-## 8. 后续升级、卸载与维护
-
-发布新版本后，先让使用者核对版本，再用 `dsh plugin --profile web add dsh-repro@新版本` 更新，安装该版本匹配的 Chromium 并重启 DSH。卸载插件：
-
-```sh
-dsh plugin --profile web remove dsh-repro
-```
-
-卸载包不会自动删除项目保存的故障用例与证据。需要保留的报告应先导出；本机地址中的启动令牌不应写入公共说明或市场截图。
-
-每次代码更新重复：测试 → 升版本 → 提交并固定标签 → 打出同一份包 → npm 发布 → Release 上传 → 公开下载复验 → 更新自己的市场条目或 Release tarball → 验证索引。仅修改 README、市场截图等展示材料，可以只推送源码文档；本次没有为这些材料重新占用 npm 版本或移动 v0.1.0 标签。
-
-下载事件、安装次数和用户数不同。npm 统计、GitHub Release 附件统计应分别展示，不能相加后称为用户量。持续提高真实下载的工作是完善示例、解决安装失败、维护兼容版本并响应使用反馈。
+后续每轮执行：代码验证 → 版本与标签 → npm/Release → 匿名下载和安装 → 更新现有市场条目 → 核验索引。npm 下载事件、GitHub 附件下载和实际用户量分别统计。

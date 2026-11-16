@@ -37,7 +37,7 @@ export class Engine {
     }
   }
   private async exclusive<T>(label: string, task: () => Promise<T>, allowRecording = false): Promise<T> {
-    if (this.disposed) throw new BusyError('Repro is shutting down')
+    if (this.disposed) throw new BusyError('Frontend Replay is shutting down')
     if (this.busy || (this.recording && !allowRecording)) throw new BusyError('Finish the current recording or run first')
     this.busy = label
     try { return await task() } finally { this.busy = '' }

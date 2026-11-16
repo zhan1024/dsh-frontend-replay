@@ -1,17 +1,17 @@
 {
-  "name": "dsh-repro",
-  "version": "0.1.0",
-  "description": "Reproduce frontend bugs, capture browser evidence, and verify fixes with repeatable acceptance checks. A DeepSeek Harness plugin and local workbench.",
+  "name": "dsh-frontend-replay",
+  "version": "0.2.0",
+  "description": "Frontend Replay · 前端验修台：录制并回放前端故障，采集浏览器证据，按相同条件验收修复。Record frontend bugs, replay steps, and verify fixes with browser evidence.",
   "type": "module",
   "license": "MIT",
   "author": "zhan1024",
-  "homepage": "https://github.com/zhan1024/dsh-repro",
+  "homepage": "https://github.com/zhan1024/dsh-frontend-replay",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/zhan1024/dsh-repro.git"
+    "url": "git+https://github.com/zhan1024/dsh-frontend-replay.git"
   },
   "bugs": {
-    "url": "https://github.com/zhan1024/dsh-repro/issues"
+    "url": "https://github.com/zhan1024/dsh-frontend-replay/issues"
   },
   "keywords": [
     "dsh",
@@ -20,7 +20,13 @@
     "frontend",
     "bug-reproduction",
     "acceptance-testing",
-    "playwright"
+    "playwright",
+    "frontend-replay",
+    "bug-replay",
+    "fix-verification",
+    "前端验修台",
+    "前端故障复现",
+    "修复验收"
   ],
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
@@ -32,6 +38,7 @@
     "./package.json": "./package.json"
   },
   "bin": {
+    "dsh-frontend-replay": "./dist/cli.js",
     "dsh-repro": "./dist/cli.js"
   },
   "files": [

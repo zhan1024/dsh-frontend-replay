@@ -1,6 +1,6 @@
 - insert:
-    - id: dsh-repro
-      name: dsh-repro
+    - id: dsh-frontend-replay
+      name: dsh-frontend-replay
       config:
         dataDir: !!js process.env.DSH_REPRO_DIR || '.dsh-repro'
         headless: !!js process.env.DSH_REPRO_HEADLESS === '1'
