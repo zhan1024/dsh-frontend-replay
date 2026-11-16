@@ -1,0 +1,6 @@
+- insert:
+    - id: dsh-repro
+      name: dsh-repro
+      config:
+        dataDir: !!js process.env.DSH_REPRO_DIR || '.dsh-repro'
+        headless: !!js process.env.DSH_REPRO_HEADLESS === '1'

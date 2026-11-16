@@ -1,0 +1,76 @@
+{
+  "name": "dsh-repro",
+  "version": "0.1.0",
+  "description": "Reproduce frontend bugs, capture browser evidence, and verify fixes with repeatable acceptance checks. A DeepSeek Harness plugin and local workbench.",
+  "type": "module",
+  "license": "MIT",
+  "author": "zhan1024",
+  "homepage": "https://github.com/zhan1024/dsh-repro",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/zhan1024/dsh-repro.git"
+  },
+  "bugs": {
+    "url": "https://github.com/zhan1024/dsh-repro/issues"
+  },
+  "keywords": [
+    "dsh",
+    "dsh-plugin",
+    "deepseek-harness",
+    "frontend",
+    "bug-reproduction",
+    "acceptance-testing",
+    "playwright"
+  ],
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "bin": {
+    "dsh-repro": "./dist/cli.js"
+  },
+  "files": [
+    "dist",
+    "ui",
+    "docs",
+    "cordis.patch.yml",
+    "README.md",
+    "README.zh-CN.md",
+    "LICENSE"
+  ],
+  "engines": {
+    "node": ">=22.15"
+  },
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  },
+  "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    }
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "npm run build && node --test test/*.test.mjs",
+    "test:e2e": "npm run build && node --test test/browser.e2e.mjs",
+    "test:dsh": "npm run build && node test/dsh.e2e.mjs",
+    "start": "node dist/cli.js",
+    "browsers": "playwright install chromium",
+    "prepack": "npm run build"
+  },
+  "dependencies": {
+    "playwright": "1.65.1"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.65.1",
+    "@types/node": "^24.0.0",
+    "typescript": "^5.9.0"
+  }
+}
