@@ -8,15 +8,15 @@
 
 | 渠道 | 实际状态 | 入口 |
 | --- | --- | --- |
-| npm | 0.2.0 更名包待发布和匿名下载复验 | https://www.npmjs.com/package/dsh-frontend-replay |
-| GitHub | 仓库已更名并保留原创建时间；0.2.0 标签和 Release 待发布 | https://github.com/zhan1024/dsh-frontend-replay |
+| npm | 0.2.0 已公开；匿名下载、SHA-512 和新 profile 安装通过 | https://www.npmjs.com/package/dsh-frontend-replay |
+| GitHub | 仓库已更名，v0.2.0 Release 已公开；匿名下载和新 profile 安装通过 | https://github.com/zhan1024/dsh-frontend-replay |
 | DSHMarket / awesome-dsh-plugin | 继续更新原 PR #15772，待审核与索引 | https://github.com/awesome-dsh-plugin/awesome-dsh-plugin/pull/15772 |
-| DeepseekPlugin | 旧名条目已上线，新名待提交和核验 | https://deepseekplugin.org/en/submit |
+| DeepseekPlugin | 新名条目已上线，已核验 README、截图和安装命令 | https://deepseekplugin.org/en/plugins/submitted?slug=zhan1024-2f-dsh-2d-frontend-2d-replay |
 | dshplugin.io | 更新原投稿 #50，待维护者处理 | https://github.com/tjsdyy/dshplugin/issues/50 |
 
-公开发布的实际证据记录在 [PUBLISHED-VERIFICATION.md](./PUBLISHED-VERIFICATION.md)。提交申请不等于市场已收录。
+公开发布的实际证据记录在 [PUBLISHED-VERIFICATION.md](./PUBLISHED-VERIFICATION.md)。npm 和 GitHub 的安装包 SHA-256 一致；新命令也通过空目录、空 npm 缓存的下载运行验证。提交申请不等于市场已收录。
 
-GitHub 原仓库创建于 `2026-11-16T03:54:47Z`。本轮使用原仓库更名，保留仓库历史和创建时间，预计于 **2026 年 11 月 17 日 11:54:47（北京时间）**达到上游要求的 24 小时门槛。年龄检查可以自动刷新，无需空提交、重开 PR 或重复投稿。
+GitHub 原仓库创建于 `2026-11-16T03:54:47Z`。本轮使用原仓库更名，保留仓库历史和创建时间，预计于 **2026 年 11 月 17 日 11:54:47（北京时间）**达到上游要求的 24 小时门槛。年龄检查可以自动刷新，无需空提交、重开 PR 或重复投稿。原有一次性跟进任务已更新为新名称，将于 **2026 年 11 月 17 日 12:00（北京时间）**核验收录状态。
 
 ## 2. 核心开发
 
@@ -106,7 +106,7 @@ DSHMarket 的收录源是 `awesome-dsh-plugin/awesome-dsh-plugin`。更新现有
 
 插件自己的 `screenshots.json` 声明 `docs/workbench.jpg`。图标用 `docs/icon.png`；截图与图标随源码公开。合并后还要在 DSHMarket 搜索 `dsh-frontend-replay`，核对作者、版本、安装命令及实际下载，才能确认收录完成。
 
-DeepseekPlugin 在提交页填新仓库 URL 并执行其发布操作；核验公开详情及匿名查询结果。dshplugin.io 通过原 Issue #50 更新名称、仓库、包版本、双语说明、截图及安装命令。人工审核状态如实保留，避免重复创建同一插件的投稿。
+DeepseekPlugin 在提交页填新仓库 URL 并执行其发布操作；核验公开详情中的名称、README、截图和安装命令；API 若拒绝匿名请求，不能据此推断条目不存在。dshplugin.io 通过原 Issue #50 更新名称、仓库、包版本、双语说明、截图及安装命令。人工审核状态如实保留，避免重复创建同一插件的投稿。
 
 ## 6. 用户下载安装与升级
 
