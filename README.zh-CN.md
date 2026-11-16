@@ -12,7 +12,9 @@ Repro 是 DeepSeek Harness（DSH）插件，同时提供独立的本地工作台
 
 ## 安装与启动
 
-需要 Node.js **22.15+**，建议 Node 24 LTS。DSH 的插件安装还需要 pnpm 10+。当前已验证 DSH **0.2.2-rc.1**。
+独立运行需要 Node.js **22.15+**。当前已验证 DSH **0.2.2-rc.1**，其 CLI 要求 Node.js **24.9+**；安装到 DSH profile 还需要 pnpm 10+。
+
+完整的核心开发、打包、npm/GitHub 发布、市场投稿及下载安装命令见[开发与分发操作手册](./docs/DEVELOP-PUBLISH-DISTRIBUTE.zh-CN.md)，其中也记录了本次各渠道的实际状态。
 
 ```sh
 # 从 npm 安装预构建插件

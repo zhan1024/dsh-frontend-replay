@@ -12,7 +12,9 @@ The distinction matters: **successful clicks do not prove a fix**. Repro reports
 
 ## Install
 
-Requires Node.js **22.15+** (Node 24 LTS recommended). DSH itself and its profile installer also require a supported Node version and pnpm 10+. DSH integration is tested against **0.2.2-rc.1**.
+The standalone plugin requires Node.js **22.15+**. DSH integration is tested against **0.2.2-rc.1**, whose CLI requires Node.js **24.9+**; profile installation also needs pnpm 10+.
+
+See the [development, publishing, distribution and installation guide (中文)](./docs/DEVELOP-PUBLISH-DISTRIBUTE.zh-CN.md) for reproducible commands and current marketplace submission status.
 
 ### From npm
 
