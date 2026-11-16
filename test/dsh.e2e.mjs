@@ -72,7 +72,7 @@ try{
   for(const required of ['dist/index.js','dist/cli.js','ui/index.html','ui/app.js','ui/style.css','cordis.patch.yml','LICENSE'])assert.ok(packed.files.some(file=>file.path===required),`tarball missing ${required}`)
   assert.ok(!packed.files.some(file=>file.path.startsWith('test/')||file.path.includes('.dsh-repro')))
   const env={DSH_HOME:home,DSH_REPRO_DIR:join(home,'evidence'),DSH_REPRO_HEADLESS:'1',DSH_TELEMETRY_MODE:'OFF',DSH_PERMISSION_MODE:'danger-full-access',REPRO_TEST_MODEL_KEY:'test-only'}
-  const install=await command(dsh,['plugin','--profile','headless','add',tarball],{env})
+  const install=await command(dsh,['plugin','--profile','headless','add',process.env.REPRO_PLUGIN_SPEC||tarball],{env})
   log(`$ dsh plugin --profile headless add <tarball>\n${install.stdout}\n${install.stderr}`)
   assert.equal(install.code,0,'install packed plugin')
   const patch=[

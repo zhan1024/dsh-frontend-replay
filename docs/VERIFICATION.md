@@ -23,6 +23,10 @@ The DSH test uses a deterministic local OpenAI-compatible model endpoint. It ver
 - The workbench creates and edits cases, executes the baseline/fix/verification flow, downloads an HTML report, reconnects with a new startup token, and fits a 390 px viewport without horizontal overflow. The 1440 px desktop layout was visually checked.
 - A generated Playwright test is run by the independent `@playwright/test` CLI: it fails on the bug and passes after the fix.
 
+## Verify a published package
+
+Set `REPRO_PLUGIN_SPEC` to a GitHub release tarball URL or an exact npm package version when running `npm run test:dsh`. The test installs that published package into a fresh profile and exercises the real agent loop. Without this override it tests the newly packed local tarball.
+
 ## Scope
 
 Chromium and top-level DOM interactions are covered. Iframes, uploads, drag-and-drop, multi-window flows and persisted authentication are outside this release. Review recordings after delayed or automatic navigation. Replaying a case does not reset the target application's backend state. Errors occurring after the explicit test state is reached are not continuously monitored.
