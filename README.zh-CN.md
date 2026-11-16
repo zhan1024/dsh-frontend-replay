@@ -2,7 +2,7 @@
 
 **留下复现步骤和证据，用同样的条件验收修复。**
 
-[English](./README.md) · [源码](https://github.com/zhan1024/dsh-repro) · [版本与安装包](https://github.com/zhan1024/dsh-repro/releases)
+[English](./README.md) · [npm](https://www.npmjs.com/package/dsh-repro) · [源码](https://github.com/zhan1024/dsh-repro) · [版本与安装包](https://github.com/zhan1024/dsh-repro/releases)
 
 Repro 是 DeepSeek Harness（DSH）插件，同时提供独立的本地工作台。它把浏览器操作保存为可重放的步骤，采集控制台、页面异常、网络请求和截图，并在修改应用后重新执行验收条件。
 
@@ -15,11 +15,11 @@ Repro 是 DeepSeek Harness（DSH）插件，同时提供独立的本地工作台
 需要 Node.js **22.15+**，建议 Node 24 LTS。DSH 的插件安装还需要 pnpm 10+。当前已验证 DSH **0.2.2-rc.1**。
 
 ```sh
-# 从预构建版本安装插件
-dsh plugin --profile web add https://github.com/zhan1024/dsh-repro/releases/download/v0.1.0/dsh-repro-0.1.0.tgz
+# 从 npm 安装预构建插件
+dsh plugin --profile web add dsh-repro@0.1.0
 
 # 安装配套 Chromium，仅需执行一次
-npm exec --yes --package=https://github.com/zhan1024/dsh-repro/releases/download/v0.1.0/dsh-repro-0.1.0.tgz -- dsh-repro install-browser
+npm exec --yes --package=dsh-repro@0.1.0 -- dsh-repro install-browser
 
 dsh web
 ```
@@ -30,10 +30,16 @@ dsh web
 
 Agent 会调用 `repro_open` 返回本机地址。打开包含 `#token` 片段的**完整地址**。
 
+也可以安装 GitHub Release 中完全相同的预构建包：
+
+```sh
+dsh plugin --profile web add https://github.com/zhan1024/dsh-repro/releases/download/v0.1.0/dsh-repro-0.1.0.tgz
+```
+
 也可以独立使用，无需模型 API Key：
 
 ```sh
-npm exec --yes --package=https://github.com/zhan1024/dsh-repro/releases/download/v0.1.0/dsh-repro-0.1.0.tgz -- dsh-repro --open
+npm exec --yes --package=dsh-repro@0.1.0 -- dsh-repro --open
 ```
 
 ## 完整使用流程

@@ -2,7 +2,7 @@
 
 **Record the bug. Keep the evidence. Verify the fix.**
 
-[简体中文](./README.zh-CN.md) · [GitHub](https://github.com/zhan1024/dsh-repro) · [Releases](https://github.com/zhan1024/dsh-repro/releases)
+[简体中文](./README.zh-CN.md) · [npm](https://www.npmjs.com/package/dsh-repro) · [GitHub](https://github.com/zhan1024/dsh-repro) · [Releases](https://github.com/zhan1024/dsh-repro/releases)
 
 Repro is a DeepSeek Harness (DSH) plugin and local frontend acceptance workbench. It turns browser interactions into replayable steps, collects screenshots and browser diagnostics, and reruns explicit acceptance conditions after your application changes.
 
@@ -14,14 +14,14 @@ The distinction matters: **successful clicks do not prove a fix**. Repro reports
 
 Requires Node.js **22.15+** (Node 24 LTS recommended). DSH itself and its profile installer also require a supported Node version and pnpm 10+. DSH integration is tested against **0.2.2-rc.1**.
 
-### From a GitHub release
+### From npm
 
 ```sh
 # A prebuilt bundle: no TypeScript build scripts run inside your DSH profile.
-dsh plugin --profile web add https://github.com/zhan1024/dsh-repro/releases/download/v0.1.0/dsh-repro-0.1.0.tgz
+dsh plugin --profile web add dsh-repro@0.1.0
 
 # Install the matching Chromium once.
-npm exec --yes --package=https://github.com/zhan1024/dsh-repro/releases/download/v0.1.0/dsh-repro-0.1.0.tgz -- dsh-repro install-browser
+npm exec --yes --package=dsh-repro@0.1.0 -- dsh-repro install-browser
 ```
 
 Restart `dsh web`, then ask:
@@ -30,10 +30,16 @@ Restart `dsh web`, then ask:
 
 The agent calls `repro_open` and returns a local workbench URL. Open the **complete** URL; its `#token` fragment authorizes your browser session.
 
+The identical prebuilt package is also available as a [GitHub release asset](https://github.com/zhan1024/dsh-repro/releases/tag/v0.1.0):
+
+```sh
+dsh plugin --profile web add https://github.com/zhan1024/dsh-repro/releases/download/v0.1.0/dsh-repro-0.1.0.tgz
+```
+
 ### Standalone workbench
 
 ```sh
-npm exec --yes --package=https://github.com/zhan1024/dsh-repro/releases/download/v0.1.0/dsh-repro-0.1.0.tgz -- dsh-repro --open
+npm exec --yes --package=dsh-repro@0.1.0 -- dsh-repro --open
 ```
 
 No DSH installation or model API key is needed for the standalone workbench.

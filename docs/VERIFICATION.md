@@ -1,5 +1,7 @@
 # Release verification · 0.1.0
 
+Public GitHub and npm installation checks are recorded in [published package verification](./PUBLISHED-VERIFICATION.md).
+
 Verified on 2026-11-16. Local environment: macOS, Node.js 26.0.0, npm 11.12.1, pnpm 10.15.1, Playwright 1.65.1, DeepSeek Harness 0.2.2-rc.1. The repository workflow repeats verification on Ubuntu with Node.js 24.
 
 ## Executed checks
