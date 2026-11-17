@@ -26,12 +26,19 @@ The DSH integration uses `@deepseek-ai/dsh@0.2.2-rc.1` and a deterministic local
 ## Distribution status
 
 - [DeepseekPlugin](https://deepseekplugin.org/en/plugins/submitted?slug=zhan1024-2f-dsh-2d-frontend-2d-replay): the new-name public detail page was inspected, including the repository, bilingual README, screenshot and `dsh-frontend-replay@0.2.0` installation command.
-- [DSHMarket catalog PR #15772](https://github.com/awesome-dsh-plugin/awesome-dsh-plugin/pull/15772): updated the existing PR title, body and submission branch to `data/plugins/zhan1024__dsh-frontend-replay.yml`; upstream entry/schema validation passed. Awaiting the 24-hour repository age check, review and indexing. The age threshold is 2026-11-17 03:54:47 UTC / 11:54:47 Asia/Shanghai.
-- [dshplugin.io submission #50](https://github.com/tjsdyy/dshplugin/issues/50): the existing submission title and body have been renamed and updated with the published 0.2.0 package; awaiting maintainer handling.
-- The existing one-time follow-up is scheduled for 2026-11-17 12:00 Asia/Shanghai and now uses the new name and package.
+- [DSHMarket catalog PR #15772](https://github.com/awesome-dsh-plugin/awesome-dsh-plugin/pull/15772): the existing PR remains open and unmerged. The repository reached 24 hours at 2026-11-17 03:54:47 UTC / 11:54:47 Asia/Shanghai. At the scheduled follow-up, the current upstream `check-submission.mjs` (blob `8364e4dae51c33f1be5a4006de766ccd0d0e177a`) was run locally for the single entry: `ok: true`, `checked: 1`, no failures or incomplete checks. The age checklist was updated in place. The hosted `check` passed, while `Submission gate` still showed the 2026-11-16 age snapshot and awaits the upstream automatic refresh. The public DSHMarket `index.json` contains no entry for either this package or the previous name; review and indexing remain pending.
+- [dshplugin.io submission #50](https://github.com/tjsdyy/dshplugin/issues/50): rechecked on 2026-11-17; still open with zero comments and no maintainer feedback. The new name and published 0.2.0 package remain in the submission.
+- The one-time follow-up for 2026-11-17 12:00 Asia/Shanghai has completed, and its automation has been deleted. No repeated submission, new npm version or tag movement was needed; no further recurring check was created.
 
 Historical v0.1.0 artifacts and evidence remain in [PUBLISHED-VERIFICATION-0.1.0.md](./PUBLISHED-VERIFICATION-0.1.0.md). Existing tags and packages were retained. Documentation updates after publication do not replace the fixed v0.2.0 artifact.
 
 Public new-name marketplace page captured after publication:
 
 ![Frontend Replay on DeepseekPlugin](./frontend-replay-marketplace.png)
+
+## Scheduled follow-up · 2026-11-17
+
+- Anonymous npm and GitHub Release downloads were checked again; both still have SHA-256 `8897bc33757f02bcec5c7bc2a727a35a4a3a887f3cc10bb250a0ef558e1e8a8e`, 253845 bytes, and npm `latest` remains `0.2.0`.
+- No maintainer comments or reviews requested changes on catalog PR #15772; only its old age verdict remains. No empty commit, resubmission or maintainer ping was made.
+- DeepseekPlugin was previously verified in the public browser. Today's direct anonymous request returned 403, so the previous observation is retained without claiming a fresh page verification.
+- Only status documentation and the existing PR age checklist were updated. The fixed v0.2.0 artifacts and historical evidence remain unchanged.
